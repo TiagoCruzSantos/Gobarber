@@ -2,7 +2,7 @@ const Appointment = require("../models/Appointment")
 const User = require('../models/User')
 const File = require('../models/File')
 const Notification = require('../models/Notification')
-const {startOfHour, parseISO, isBefore} = require('date-fns')
+const {startOfHour, parseISO, isBefore, subHours} = require('date-fns')
 const Yup = require('yup')
 
 class AppointmentController{
@@ -83,6 +83,30 @@ class AppointmentController{
             appointment_id: appointment.id,
             user_id: provider.id
         })
+
+        return res.json(appointment)
+    }
+
+    async delete(req, res){
+        if(!req.params.id){
+            return res.status(400).json({error: "There is no appointment id in the request"})
+        }
+
+        const appointment = await Appointment.findByPk(req.params.id)
+
+        if(appointment.user_id !== req.userId){
+            return res.status(401).json({error: 'You do not have permission to cancel this appointment'})
+        }
+
+        const dateWithSub = subHours(appointment.date, 2)
+
+        if(isBefore(dateWithSub, new Date())){
+            return res.status(401).json({error: "You can only cancel appointments 2 hours in advance"})
+        }
+
+        appointment.canceled_at = new Date()
+
+        appointment.save()
 
         return res.json(appointment)
     }
