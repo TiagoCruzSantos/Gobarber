@@ -1,4 +1,5 @@
+require('dotenv/config')
 module.exports = {
-    host: 'localhost',
+    host: process.env.REDIS_HOST,
     port: 6379
 }
