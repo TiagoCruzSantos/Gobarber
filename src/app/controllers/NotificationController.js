@@ -1,6 +1,6 @@
 const User = require('../models/User')
 const Notification = require('../models/Notification')
-
+const Appointment = require('../models/Appointment')
 class NotificationController{
     async index(req, res){
 
@@ -16,6 +16,17 @@ class NotificationController{
         }
 
         const notifications = await Notification.findAll({
+            include: [{
+                model: Appointment,
+                as: 'appointment',
+                attributes: ['id','date'],
+                include: [{
+                    model: User,
+                    as: 'user',
+                    attributes: ['id','name']
+                }]
+            }],
+            attributes: ['id','content'],
             where: {
                 user_id: req.userId
             },
