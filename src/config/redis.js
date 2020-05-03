@@ -1,5 +1,5 @@
 require('dotenv/config')
 module.exports = {
     host: process.env.REDIS_HOST,
-    port: 6379
+    port: parseInt(process.env.REDIS_PORT)
 }
